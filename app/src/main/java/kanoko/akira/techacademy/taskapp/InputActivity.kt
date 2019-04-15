@@ -8,10 +8,12 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import io.realm.Realm
 import kotlinx.android.synthetic.main.content_input.*
 import java.util.*
+import kotlin.math.truncate
 
 class InputActivity : AppCompatActivity() {
 
@@ -84,6 +86,7 @@ class InputActivity : AppCompatActivity() {
         } else {
             // 更新の場合
             title_edit_text.setText(mTask!!.title)
+            category_edit_text.setText(mTask!!.category)
             content_edit_text.setText(mTask!!.contents)
 
             val calendar = Calendar.getInstance()
@@ -123,9 +126,11 @@ class InputActivity : AppCompatActivity() {
         }
 
         val title = title_edit_text.text.toString()
+        val category = category_edit_text.text.toString()
         val content = content_edit_text.text.toString()
 
         mTask!!.title = title
+        mTask!!.category = category
         mTask!!.contents = content
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
