@@ -9,7 +9,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import io.realm.RealmChangeListener
 import io.realm.Sort
 import android.content.Intent
+import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.SearchView
+import android.util.Log
+import android.view.Menu
+import android.widget.TextView
+import java.lang.Exception
 
 const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.TASK"
 
@@ -22,6 +28,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var mTaskAdapter: TaskAdapter
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.searchview, menu)
+
+        val searchItem = menu.findItem(R.id.menu_search)
+        val searchView = searchItem.actionView as SearchView
+        searchView.setQueryHint("カテゴリ名で検索")
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            var word:String = searchView.toString()
+            override fun onQueryTextChange(newText: String): Boolean {
+                Log.d("taskapplog","$word")
+                return false
+            }
+            override fun onQueryTextSubmit(query: String): Boolean {
+                // task HERE
+                Log.d("taskapplog","$word")
+                return false
+            }
+        })
+        return super.onCreateOptionsMenu(menu)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             builder.setTitle("削除")
             builder.setMessage(task.title + "を削除しますか")
 
-            builder.setPositiveButton("OK"){_, _ ->
+            builder.setPositiveButton("OK") { _, _ ->
                 val results = mRealm.where(Task::class.java).equalTo("id", task.id).findAll()
 
                 mRealm.beginTransaction()
@@ -89,10 +117,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         reloadListView()
+
+//        val seatchView = tbTestToolbar.menu.findItem(R.id.itmSearch).actionView as SearchView
+
+
+
+
     }
 
     private fun reloadListView() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
+//        val taskRealmResults = mRealm.where(Task::class.java).equalTo("category", "$searchword").sort("date", Sort.DESCENDING)
         val taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
 
         // 上記の結果を、TaskList としてセットする
