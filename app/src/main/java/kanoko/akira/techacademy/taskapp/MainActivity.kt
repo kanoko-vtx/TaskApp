@@ -15,6 +15,7 @@ import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
 import android.widget.TextView
+import io.realm.RealmResults
 import java.lang.Exception
 
 const val EXTRA_TASK = "jp.techacademy.taro.kirameki.taskapp.TASK"
@@ -127,7 +128,6 @@ class MainActivity : AppCompatActivity() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
         if (word != null){
             val taskRealmResults = mRealm.where(Task::class.java).contains("category", "$word").findAll()
-
             Log.d("taskapplog","入力中 :$word")
 
             // 上記の結果を、TaskList としてセットする
@@ -139,7 +139,6 @@ class MainActivity : AppCompatActivity() {
             mTaskAdapter.notifyDataSetChanged()
         } else {
             val taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
-
             Log.d("taskapplog","検索送信 :$word")
 
             // 上記の結果を、TaskList としてセットする
