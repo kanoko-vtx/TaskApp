@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mTaskAdapter: TaskAdapter
 
+    var word:String? = null
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.searchview, menu)
 
@@ -37,14 +39,15 @@ class MainActivity : AppCompatActivity() {
         searchView.setQueryHint("カテゴリ名で検索")
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            var word:String = searchView.toString()
-            override fun onQueryTextChange(newText: String): Boolean {
+            override fun onQueryTextChange(query: String?): Boolean {
+                word = query.toString()
                 Log.d("taskapplog","$word")
+                reloadListView()
                 return false
             }
-            override fun onQueryTextSubmit(query: String): Boolean {
-                // task HERE
+            override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d("taskapplog","$word")
+                reloadListView()
                 return false
             }
         })
@@ -118,26 +121,35 @@ class MainActivity : AppCompatActivity() {
 
         reloadListView()
 
-//        val seatchView = tbTestToolbar.menu.findItem(R.id.itmSearch).actionView as SearchView
-
-
-
-
     }
 
     private fun reloadListView() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
-//        val taskRealmResults = mRealm.where(Task::class.java).equalTo("category", "$searchword").sort("date", Sort.DESCENDING)
-        val taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
+        if (word != null){
+            val taskRealmResults = mRealm.where(Task::class.java).contains("category", "$word").findAll()
 
-        // 上記の結果を、TaskList としてセットする
-        mTaskAdapter.taskList = mRealm.copyFromRealm(taskRealmResults)
+            Log.d("taskapplog","入力中 :$word")
 
-        // TaskのListView用のアダプタに渡す
-        listView1.adapter = mTaskAdapter
+            // 上記の結果を、TaskList としてセットする
+            mTaskAdapter.taskList = mRealm.copyFromRealm(taskRealmResults)
 
-        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
-        mTaskAdapter.notifyDataSetChanged()
+            listView1.adapter = mTaskAdapter
+
+            // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+            mTaskAdapter.notifyDataSetChanged()
+        } else {
+            val taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
+
+            Log.d("taskapplog","検索送信 :$word")
+
+            // 上記の結果を、TaskList としてセットする
+            mTaskAdapter.taskList = mRealm.copyFromRealm(taskRealmResults)
+
+            listView1.adapter = mTaskAdapter
+
+            // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+            mTaskAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun onDestroy() {
